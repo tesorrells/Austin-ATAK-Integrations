@@ -90,10 +90,22 @@ class CoTSender:
             # Start TXWorker as a background task to avoid blocking startup
             try:
                 # Try to start TXWorker as a background task
-                asyncio.create_task(self._tx.run())
+                self._tx_task = asyncio.create_task(self._tx.run())
                 logger.info("Started TXWorker as background task")
                 # Give it a moment to start
                 await asyncio.sleep(0.1)
+                
+                # Check if the task is still running
+                if self._tx_task.done():
+                    logger.error("TXWorker task completed immediately - this indicates an error")
+                    try:
+                        result = self._tx_task.result()
+                        logger.error(f"TXWorker task result: {result}")
+                    except Exception as e:
+                        logger.error(f"TXWorker task exception: {e}")
+                else:
+                    logger.info("TXWorker task is running successfully")
+                    
             except Exception as e:
                 logger.warning(f"Failed to start TXWorker as task: {e}")
                 # Fallback: try other methods
