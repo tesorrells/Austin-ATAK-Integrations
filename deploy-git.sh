@@ -84,6 +84,11 @@ if [ -d "$DEPLOY_DIR" ]; then
         rm -rf "$DEPLOY_DIR"
         mkdir -p "$DEPLOY_DIR"
         cd "$DEPLOY_DIR"
+        
+        # Clone the repository
+        REPO_URL="https://github.com/tesorrells/Austin-ATAK-Integrations.git"
+        log_info "Cloning repository from: $REPO_URL"
+        git clone "$REPO_URL" .
     fi
 else
     log_info "Creating new deployment directory..."
