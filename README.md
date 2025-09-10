@@ -308,10 +308,10 @@ git add . && git commit -m "Deployment ready" && git push origin main
 
 # 2. Deploy on server
 ssh youruser@your-server-ip
-curl -fsSL https://raw.githubusercontent.com/yourusername/Austin-ATAK-Integrations/main/deploy-git.sh | bash
+curl -fsSL https://raw.githubusercontent.com/tesorrells/Austin-ATAK-Integrations/main/deploy.sh | bash
 
 # 3. Complete setup
-cd ~/austin-atak-integrations
+cd /opt/austin-atak-integrations
 ./setup-git-production.sh
 ./setup-network.sh
 docker-compose up -d

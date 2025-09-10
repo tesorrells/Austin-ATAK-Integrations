@@ -183,56 +183,12 @@ class CoTSender:
         try:
             # Put the CoT XML in the queue
             await self._queue.put(cot_xml)
-            logger.info(f"CoT event queued for transmission (length: {len(cot_xml)} chars)")
-            
-            # Also try direct socket transmission as a test
-            await self._test_direct_transmission(cot_xml)
-            
+            logger.debug(f"CoT event queued for transmission (length: {len(cot_xml)} chars)")
             return True
             
         except Exception as e:
             logger.error(f"Failed to send CoT event: {e}")
             return False
-    
-    async def _test_direct_transmission(self, cot_xml: str) -> None:
-        """Test direct socket transmission to TAK server."""
-        try:
-            import socket
-            import asyncio
-            
-            # Parse the COT_URL to get host and port
-            if settings.cot_url.startswith("tcp://"):
-                url_part = settings.cot_url[6:]  # Remove "tcp://"
-                if ":" in url_part:
-                    host, port = url_part.split(":", 1)
-                    port = int(port)
-                else:
-                    host = url_part
-                    port = 8087
-            else:
-                logger.warning("Direct transmission test only supports TCP")
-                return
-            
-            # Create socket and send CoT
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(5)
-            
-            try:
-                sock.connect((host, port))
-                logger.info(f"Direct socket connection to {host}:{port} successful")
-                
-                # Send the CoT XML
-                cot_bytes = cot_xml.encode('utf-8')
-                sock.send(cot_bytes)
-                logger.info(f"Direct transmission sent {len(cot_bytes)} bytes to TAK server")
-                
-            except Exception as e:
-                logger.error(f"Direct transmission failed: {e}")
-            finally:
-                sock.close()
-                
-        except Exception as e:
-            logger.error(f"Direct transmission test error: {e}")
     
     @property
     def is_running(self) -> bool:
