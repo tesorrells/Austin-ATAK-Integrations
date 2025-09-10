@@ -49,17 +49,80 @@ class CoTSender:
             except Exception as e1:
                 logger.warning(f"pytak.Writer failed: {e1}")
                 try:
-                    # Pattern 2: Try creating a simple writer class
+                    # Pattern 2: Try creating a simple writer class that actually sends data
                     class SimpleWriter:
                         def __init__(self, queue, config):
                             self.queue = queue
                             self.config = config
+                            self.socket = None
+                            self.running = False
                         
                         async def start(self):
-                            pass
+                            """Start the writer and establish connection."""
+                            try:
+                                import socket
+                                import asyncio
+                                
+                                # Parse the COT_URL
+                                cot_url = self.config.get("COT_URL", "")
+                                if not cot_url:
+                                    raise ValueError("COT_URL not configured")
+                                
+                                # Parse URL (e.g., tcp://tak-server:8087)
+                                if cot_url.startswith("tcp://"):
+                                    host_port = cot_url[6:]  # Remove "tcp://"
+                                    if ":" in host_port:
+                                        host, port = host_port.split(":", 1)
+                                        port = int(port)
+                                    else:
+                                        host = host_port
+                                        port = 8087  # Default port
+                                else:
+                                    raise ValueError(f"Unsupported COT_URL format: {cot_url}")
+                                
+                                # Create socket connection
+                                self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                                self.socket.settimeout(10)
+                                self.socket.connect((host, port))
+                                logger.info(f"Connected to TAK server at {host}:{port}")
+                                
+                                self.running = True
+                                
+                                # Start background task to process queue
+                                asyncio.create_task(self._process_queue())
+                                
+                            except Exception as e:
+                                logger.error(f"Failed to start SimpleWriter: {e}")
+                                raise
+                        
+                        async def _process_queue(self):
+                            """Process the queue and send CoT events."""
+                            while self.running:
+                                try:
+                                    # Get CoT event from queue (with timeout)
+                                    cot_xml = await asyncio.wait_for(self.queue.get(), timeout=1.0)
+                                    
+                                    if self.socket and cot_xml:
+                                        # Send the CoT XML
+                                        self.socket.send(cot_xml.encode('utf-8'))
+                                        logger.info(f"Sent CoT event to TAK server ({len(cot_xml)} chars)")
+                                        
+                                except asyncio.TimeoutError:
+                                    continue  # No events in queue, keep waiting
+                                except Exception as e:
+                                    logger.error(f"Error processing CoT queue: {e}")
+                                    break
                         
                         async def stop(self):
-                            pass
+                            """Stop the writer and close connection."""
+                            self.running = False
+                            if self.socket:
+                                try:
+                                    self.socket.close()
+                                    logger.info("Closed connection to TAK server")
+                                except:
+                                    pass
+                                self.socket = None
                     
                     writer = SimpleWriter(self._queue, config)
                     logger.info("Created SimpleWriter")
@@ -183,7 +246,7 @@ class CoTSender:
         try:
             # Put the CoT XML in the queue
             await self._queue.put(cot_xml)
-            logger.debug(f"CoT event queued for transmission (length: {len(cot_xml)} chars)")
+            logger.info(f"CoT event queued for transmission (length: {len(cot_xml)} chars)")
             return True
             
         except Exception as e:
