@@ -1,0 +1,14 @@
+[Unit]
+Description=Austin CoT Feeds
+After=docker.service
+Requires=docker.service
+
+[Service]
+WorkingDirectory=/opt/austin-cot
+ExecStart=/usr/bin/docker compose up --pull always --no-color
+ExecStop=/usr/bin/docker compose down
+TimeoutStopSec=30
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

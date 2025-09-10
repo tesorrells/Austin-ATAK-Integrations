@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  austin-cot:
+    build: .
+    container_name: austin-atak-integrations
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - COT_URL=${COT_URL}
+      - SODA_APP_TOKEN=${SODA_APP_TOKEN}
+      - FIRE_DATASET=${FIRE_DATASET:-wpu4-x69d}
+      - TRAFFIC_DATASET=${TRAFFIC_DATASET:-dx9v-zd7x}
+      - POLL_SECONDS=${POLL_SECONDS:-45}
+      - COT_STALE_MINUTES=${COT_STALE_MINUTES:-10}
+      - PYTAK_TLS_CLIENT_CERT=${PYTAK_TLS_CLIENT_CERT:-/certs/client.p12}
+      - PYTAK_TLS_CLIENT_CERT_PASSWORD=${PYTAK_TLS_CLIENT_CERT_PASSWORD}
+      - PYTAK_TLS_CA=${PYTAK_TLS_CA:-/certs/ca.pem}
+    volumes:
+      - /opt/austin-cot/certs:/certs:ro
+      - austin-cot-data:/app/app/store
+    ports:
+      - "127.0.0.1:8080:8080"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import httpx; httpx.get('http://localhost:8080/healthz')",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  austin-cot-data:
+    driver: local
