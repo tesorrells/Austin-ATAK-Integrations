@@ -21,7 +21,7 @@ def build_incident_cot(
     callsign: str,
     remarks: str,
     link: str,
-    cot_type: str = "a-f-G-U-C",
+    cot_type: str = "a-.-X-i",
     stale_minutes: int = 10,
     how: str = "m-g"
 ) -> str:
@@ -157,6 +157,7 @@ def build_fire_incident_cot(
         callsign=callsign,
         remarks=remarks,
         link=link,
+        cot_type="a-.-X-i-f",  # Fire incident type
         stale_minutes=stale_minutes
     )
 
@@ -226,5 +227,6 @@ def build_traffic_incident_cot(
         callsign=callsign,
         remarks=remarks,
         link=link,
+        cot_type="a-.-X-i-t-v",  # Transportation Vehicle incident type
         stale_minutes=stale_minutes
     )

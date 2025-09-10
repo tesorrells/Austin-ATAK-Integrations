@@ -83,6 +83,7 @@ def build_incident_closure_cot(
         link = f"https://data.austintexas.gov/resource/dx9v-zd7x.json?traffic_report_id={incident_id}"
     
     # Create closure CoT with immediate stale time (1 minute)
+    cot_type = "a-.-X-i-f" if feed_type == "fire" else "a-.-X-i-t-v"
     return build_incident_cot(
         uid=uid,
         lat=lat,
@@ -90,6 +91,7 @@ def build_incident_closure_cot(
         callsign=callsign,
         remarks=remarks,
         link=link,
+        cot_type=cot_type,
         stale_minutes=1  # Immediate stale for closure
     )
 
