@@ -13,7 +13,7 @@ class CoTSender:
     """PyTAK-based CoT sender for TAK Server communication."""
     
     def __init__(self):
-        self._queue: Optional[pytak.QueueWorker] = None
+        self._queue: Optional[asyncio.Queue] = None
         self._tx: Optional[pytak.TXWorker] = None
         self._running = False
     
@@ -32,11 +32,10 @@ class CoTSender:
             }
             
             # Create queue and transmitter
-            self._queue = pytak.QueueWorker()
+            self._queue = asyncio.Queue()
             self._tx = pytak.TXWorker(self._queue, config)
             
-            # Start workers
-            await self._queue.start()
+            # Start transmitter
             await self._tx.start()
             
             self._running = True
@@ -54,8 +53,6 @@ class CoTSender:
         try:
             if self._tx:
                 await self._tx.stop()
-            if self._queue:
-                await self._queue.stop()
             
             self._running = False
             logger.info("CoT sender stopped")
