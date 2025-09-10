@@ -294,6 +294,37 @@ austin-feeds/
 └── README.md
 ```
 
+## Deployment Options
+
+### Git-Based Deployment (Recommended)
+
+For deploying to your DigitalOcean server without root access, see [README-DEPLOYMENT.md](README-DEPLOYMENT.md) for a complete guide.
+
+**Quick Start:**
+
+```bash
+# 1. Push to git repository
+git add . && git commit -m "Deployment ready" && git push origin main
+
+# 2. Deploy on server
+ssh youruser@your-server-ip
+curl -fsSL https://raw.githubusercontent.com/yourusername/Austin-ATAK-Integrations/main/deploy-git.sh | bash
+
+# 3. Complete setup
+cd ~/austin-atak-integrations
+./setup-git-production.sh
+./setup-network.sh
+docker-compose up -d
+```
+
+### TCP Connection (Simplified)
+
+The deployment scripts are configured to use TCP connection to your TAK Server, which eliminates the need for certificates:
+
+- **Protocol**: TCP (no certificates needed!)
+- **Address**: `tcp://tak-server-tak-1:8087`
+- **Authentication**: Anonymous (matches your TAK Server config)
+
 ## License
 
 This project is licensed under the MIT License.
