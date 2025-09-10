@@ -86,7 +86,28 @@ class CoTSender:
             
             # Start the writer and transmitter
             await writer.start()
-            await self._tx.start()
+            
+            # Try different ways to start TXWorker
+            try:
+                # Method 1: Try start() method
+                await self._tx.start()
+                logger.info("Started TXWorker with start() method")
+            except AttributeError:
+                try:
+                    # Method 2: Try run() method
+                    await self._tx.run()
+                    logger.info("Started TXWorker with run() method")
+                except AttributeError:
+                    try:
+                        # Method 3: Try _run() method
+                        await self._tx._run()
+                        logger.info("Started TXWorker with _run() method")
+                    except AttributeError:
+                        # Method 4: Try to start it as a task
+                        asyncio.create_task(self._tx.run())
+                        logger.info("Started TXWorker as asyncio task")
+                        # Give it a moment to start
+                        await asyncio.sleep(0.1)
             
             self._running = True
             logger.info("CoT sender started successfully")
@@ -102,7 +123,18 @@ class CoTSender:
         
         try:
             if self._tx:
-                await self._tx.stop()
+                # Try different ways to stop TXWorker
+                try:
+                    await self._tx.stop()
+                except AttributeError:
+                    try:
+                        await self._tx.close()
+                    except AttributeError:
+                        try:
+                            self._tx.cancel()
+                        except AttributeError:
+                            pass  # TXWorker might not have a stop method
+            
             if self._writer:
                 await self._writer.stop()
             
