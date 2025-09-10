@@ -15,6 +15,7 @@ class CoTSender:
     def __init__(self):
         self._queue: Optional[asyncio.Queue] = None
         self._tx: Optional[pytak.TXWorker] = None
+        self._writer: Optional[pytak.Writer] = None
         self._running = False
     
     async def start(self) -> None:
@@ -31,11 +32,13 @@ class CoTSender:
                 "PYTAK_TLS_CA": settings.pytak_tls_ca,
             }
             
-            # Create queue and transmitter
+            # Create queue, writer, and transmitter
             self._queue = asyncio.Queue()
-            self._tx = pytak.TXWorker(self._queue, config)
+            self._writer = pytak.Writer(self._queue, config)
+            self._tx = pytak.TXWorker(self._queue, config, self._writer)
             
-            # Start transmitter
+            # Start writer and transmitter
+            await self._writer.start()
             await self._tx.start()
             
             self._running = True
@@ -53,6 +56,8 @@ class CoTSender:
         try:
             if self._tx:
                 await self._tx.stop()
+            if self._writer:
+                await self._writer.stop()
             
             self._running = False
             logger.info("CoT sender stopped")
