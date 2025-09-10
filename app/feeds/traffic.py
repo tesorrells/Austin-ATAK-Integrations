@@ -22,9 +22,11 @@ class TrafficFeedPoller:
         self.dataset_id = settings.traffic_dataset
         self.poll_interval = settings.poll_seconds
         self.stale_minutes = settings.cot_stale_minutes
+        self.resend_interval = settings.resend_active_interval
         self._running = False
         self._client: Optional[httpx.AsyncClient] = None
         self._lifecycle_manager = IncidentLifecycleManager()
+        self._poll_count = 0
     
     async def start(self) -> None:
         """Start the traffic feed poller."""
@@ -72,6 +74,9 @@ class TrafficFeedPoller:
             return
         
         try:
+            # Increment poll count
+            self._poll_count += 1
+            
             # Build query for incidents published in the last 10 minutes
             # This helps us catch updates to existing incidents
             ten_minutes_ago = datetime.now(timezone.utc) - timedelta(minutes=10)
@@ -101,7 +106,9 @@ class TrafficFeedPoller:
                     if incident_id:
                         current_incidents[incident_id] = incident
                     
-                    await self._process_incident(incident)
+                    # Check if we should re-send this incident (for new connections)
+                    should_resend = (self._poll_count % self.resend_interval == 0)
+                    await self._process_incident(incident, force_resend=should_resend)
                     incidents_sent += 1
                 except Exception as e:
                     logger.error(f"Error processing traffic incident: {e}")
@@ -129,7 +136,7 @@ class TrafficFeedPoller:
         except Exception as e:
             logger.error(f"Unexpected error polling traffic incidents: {e}")
     
-    async def _process_incident(self, incident: Dict[str, Any]) -> None:
+    async def _process_incident(self, incident: Dict[str, Any], force_resend: bool = False) -> None:
         """Process a single traffic incident."""
         # Validate required fields
         if not self._validate_incident(incident):
@@ -145,20 +152,23 @@ class TrafficFeedPoller:
             logger.error(f"Error building CoT for traffic incident: {e}")
             return
         
-        # Send CoT if sender is available
+        # Send CoT if sender is available and either it's new or we're forcing a resend
         cot_sent = False
-        if cot_sender.is_running:
+        if cot_sender.is_running and (not is_seen or force_resend):
             cot_sent = await cot_sender.send_cot(cot_xml)
             if not cot_sent:
                 logger.warning(f"Failed to send CoT for traffic incident: {incident.get('traffic_report_id', 'unknown')}")
-        else:
+        elif not cot_sender.is_running:
             logger.error("CoT sender is not running, cannot send CoT")
         
-        # Mark incident as seen
-        await seen_store.mark_incident_seen("traffic", incident, cot_sent)
+        # Mark incident as seen (only if we actually sent it)
+        if cot_sent:
+            await seen_store.mark_incident_seen("traffic", incident, cot_sent)
         
         if not is_seen:
             logger.info(f"New traffic incident: {incident.get('traffic_report_id', 'unknown')} - {incident.get('issue_reported', 'TRAFFIC INCIDENT')}")
+        elif force_resend and cot_sent:
+            logger.info(f"Re-sent traffic incident: {incident.get('traffic_report_id', 'unknown')} - {incident.get('issue_reported', 'TRAFFIC INCIDENT')}")
     
     def _validate_incident(self, incident: Dict[str, Any]) -> bool:
         """Validate that an incident has required fields."""

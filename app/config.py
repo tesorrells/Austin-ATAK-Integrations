@@ -20,9 +20,10 @@ class Settings(BaseSettings):
     fire_dataset: str = Field("wpu4-x69d", env="FIRE_DATASET", description="Fire incidents dataset ID")
     traffic_dataset: str = Field("dx9v-zd7x", env="TRAFFIC_DATASET", description="Traffic incidents dataset ID")
     
-    # Polling Configuration
-    poll_seconds: int = Field(45, env="POLL_SECONDS", description="Polling interval in seconds")
-    cot_stale_minutes: int = Field(10, env="COT_STALE_MINUTES", description="CoT stale time in minutes")
+            # Polling Configuration
+            poll_seconds: int = Field(45, env="POLL_SECONDS", description="Polling interval in seconds")
+            cot_stale_minutes: int = Field(10, env="COT_STALE_MINUTES", description="CoT stale time in minutes")
+            resend_active_interval: int = Field(5, env="RESEND_ACTIVE_INTERVAL", description="Re-send active incidents every N polling cycles")
     
     # Database Configuration
     database_url: str = Field("sqlite:///./app/store/seen.db", env="DATABASE_URL", description="Database URL for deduplication")
