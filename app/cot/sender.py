@@ -103,9 +103,12 @@ class CoTSender:
                                     cot_xml = await asyncio.wait_for(self.queue.get(), timeout=1.0)
                                     
                                     if self.socket and cot_xml:
-                                        # Send the CoT XML
-                                        self.socket.send(cot_xml.encode('utf-8'))
-                                        logger.info(f"Sent CoT event to TAK server ({len(cot_xml)} chars)")
+                                        # Send the CoT XML with newline (some TAK servers expect this)
+                                        cot_data = (cot_xml + '\n').encode('utf-8')
+                                        self.socket.send(cot_data)
+                                        logger.info(f"Sent CoT event to TAK server ({len(cot_data)} bytes)")
+                                        # Debug: Log first 200 chars of CoT XML
+                                        logger.debug(f"CoT XML preview: {cot_xml[:200]}...")
                                         
                                 except asyncio.TimeoutError:
                                     continue  # No events in queue, keep waiting

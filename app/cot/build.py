@@ -21,7 +21,7 @@ def build_incident_cot(
     callsign: str,
     remarks: str,
     link: str,
-    cot_type: str = "b-e-i",
+    cot_type: str = "a-f-G-U-C",
     stale_minutes: int = 10,
     how: str = "m-g"
 ) -> str:
@@ -83,7 +83,13 @@ def build_incident_cot(
     
     # Parse and reformat for better readability
     reparsed = ET.fromstring(rough_string)
-    return ET.tostring(reparsed, encoding="unicode")
+    formatted_xml = ET.tostring(reparsed, encoding="unicode")
+    
+    # Add XML declaration if not present
+    if not formatted_xml.startswith('<?xml'):
+        formatted_xml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n' + formatted_xml
+    
+    return formatted_xml
 
 
 def build_fire_incident_cot(
