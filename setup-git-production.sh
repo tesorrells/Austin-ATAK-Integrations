@@ -66,8 +66,6 @@ EOF
 # Create Docker Compose file
 log_step "Creating Docker Compose configuration..."
 cat > docker-compose.yml << EOF
-version: '3.8'
-
 services:
   austin-atak-integrations:
     build: .
@@ -86,8 +84,6 @@ services:
       - "8080:8080"
     networks:
       - tak-network
-    depends_on:
-      - tak-server-tak-1
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
