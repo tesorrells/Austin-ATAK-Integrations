@@ -10,10 +10,10 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
     
     # CoT/TLS Configuration
-    cot_url: str = Field(..., env="COT_URL", description="TAK Server CoT URL (tls://host:port)")
-    pytak_tls_client_cert: str = Field(..., env="PYTAK_TLS_CLIENT_CERT", description="Path to client certificate")
-    pytak_tls_client_cert_password: str = Field(..., env="PYTAK_TLS_CLIENT_CERT_PASSWORD", description="Client certificate password")
-    pytak_tls_ca: str = Field(..., env="PYTAK_TLS_CA", description="Path to CA certificate")
+    cot_url: str = Field(..., env="COT_URL", description="TAK Server CoT URL (tcp://host:port or tls://host:port)")
+    pytak_tls_client_cert: Optional[str] = Field(None, env="PYTAK_TLS_CLIENT_CERT", description="Path to client certificate (required for TLS)")
+    pytak_tls_client_cert_password: Optional[str] = Field(None, env="PYTAK_TLS_CLIENT_CERT_PASSWORD", description="Client certificate password (required for TLS)")
+    pytak_tls_ca: Optional[str] = Field(None, env="PYTAK_TLS_CA", description="Path to CA certificate (required for TLS)")
     
     # SODA API Configuration
     soda_app_token: Optional[str] = Field(None, env="SODA_APP_TOKEN", description="Socrata App Token for rate limiting")
