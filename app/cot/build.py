@@ -227,6 +227,6 @@ def build_traffic_incident_cot(
         callsign=callsign,
         remarks=remarks,
         link=link,
-        cot_type="a-.-X-i-t-v",  # Transportation Vehicle incident type
+        cot_type="a-.-X-i-t-v-a",  # Transportation Vehicle incident type
         stale_minutes=stale_minutes
     )

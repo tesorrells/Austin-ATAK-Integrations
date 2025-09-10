@@ -1,0 +1,68 @@
+  <cot  cot="a-.-X"		       full="Other"	                                                    desc="Other"                                                                  />
+  <cot  cot="a-.-X-i"                  full="Other/INCIDENT"                                                desc="Incident"                                                               />
+  <cot  cot="a-.-X-i-g"                full="Other/INCIDENT/GEO"                                            desc="Geophysical"                                          		  />
+  <cot  cot="a-.-X-i-g-a"              full="Other/INCIDENT/GEO/AVALANCHE"                                  desc="Geophysical Avalanche"                                                  />
+  <cot  cot="a-.-X-i-g-e"              full="Other/INCIDENT/GEO/EARTHQUAKE"                                 desc="Geophysical Earthquake"                                                 />
+  <cot  cot="a-.-X-i-g-e-a"            full="Other/INCIDENT/GEO/AFTERSHOCK"                                 desc="Geophysical Earthquake Aftershock"                                      />
+  <cot  cot="a-.-X-i-g-e-e"            full="Other/INCIDENT/GEO/EPICENTER"                                  desc="Geophysical Earthquake Epicenter"                                       />
+  <cot  cot="a-.-X-i-g-l"              full="Other/INCIDENT/GEO/LANDSLIDE"                                  desc="Geophysical Landslide"                                                  />
+  <cot  cot="a-.-X-i-g-s"              full="Other/INCIDENT/GEO/SUBSISTANCE"                                desc="Geophysical Subsistance"                                                />
+  <cot  cot="a-.-X-i-g-v"              full="Other/INCIDENT/GEO/VOLCANO"                                    desc="Geophysical Volcano"                                                    />
+  <cot  cot="a-.-X-i-g-v-e"            full="Other/INCIDENT/GEO/ERUPTION"                                   desc="Geophysical Volcano Eruption"                                           />
+  <cot  cot="a-.-X-i-g-v-t"            full="Other/INCIDENT/GEO/VOLCANO THREAT"                             desc="Geophysical Volcano Threat"                                             />
+  <cot  cot="a-.-X-i-m"                full="Other/INCIDENT/MET"                                            desc="Meteorological"		                                          />
+  <cot  cot="a-.-X-i-m-z"              full="Other/INCIDENT/MET/DRIZZLE"                                    desc="Meteorological Drizzle"	                                          />
+  <cot  cot="a-.-X-i-m-d"              full="Other/INCIDENT/MET/DROUGHT"                                    desc="Meteorological Drought"	                                          />
+  <cot  cot="a-.-X-i-m-f"              full="Other/INCIDENT/MET/FLOOD"                                      desc="Meteorological Flood"		                                          />
+  <cot  cot="a-.-X-i-m-g"              full="Other/INCIDENT/MET/FOG"                                        desc="Meteorological Fog"		                                          />
+  <cot  cot="a-.-X-i-m-h"              full="Other/INCIDENT/MET/HAIL"                                       desc="Meteorological Hail"		                                          />
+  <cot  cot="a-.-X-i-m-i"              full="Other/INCIDENT/MET/INVERSION"                                  desc="Meteorological Inversion"	                                          />
+  <cot  cot="a-.-X-i-m-r"              full="Other/INCIDENT/MET/RAIN"                                       desc="Meteorological Rain"		                                          />
+  <cot  cot="a-.-X-i-m-a"              full="Other/INCIDENT/MET/SANDSTORM"                                  desc="Meteorological Sandstorm"	                                          />
+  <cot  cot="a-.-X-i-m-s"              full="Other/INCIDENT/MET/SNOW"                                       desc="Meteorological Snow"		                                          />
+  <cot  cot="a-.-X-i-m-u"              full="Other/INCIDENT/METTHUNDERSTORM"                                desc="Meteorological Thunderstorm"	                                          />
+  <cot  cot="a-.-X-i-m-t"              full="Other/INCIDENT/MET/TORNADO"                                    desc="Meteorological Tornado"	                                          />
+  <cot  cot="a-.-X-i-m-c"              full="Other/INCIDENT/MET/CYCLONE"                                    desc="Meteorological Cyclone"	                                          />
+  <cot  cot="a-.-X-i-m-n"              full="Other/INCIDENT/MET/TSUNAMI"                                    desc="Meteorological Tsunami" 	                                          />
+  <cot  cot="a-.-X-i-s"                full="Other/INCIDENT/SAFETY"                                         desc="Safety"		                                                  />
+  <cot  cot="a-.-X-i-l"                full="Other/INCIDENT/SECURITY"               	                    desc="Security"		                                                  />
+  <cot  cot="a-.-X-i-l-c"              full="Other/INCIDENT/SECURITY/CIVIL DISTURB"           	            desc="Security Civil Disturbance"		                                  />
+  <cot  cot="a-.-X-i-l-c-d"            full="Other/INCIDENT/SECURITY/CIVIL DISTURB/DEMONSTRATION"           desc="Security Civil Disturbance Demonstration"		                  />
+  <cot  cot="a-.-X-i-l-c-p"            full="Other/INCIDENT/SECURITY/CIVIL DISTURB/DISPLACED"       	    desc="Security Civil Disturbance Displaced Population"		          />
+  <cot  cot="a-.-X-i-l-c-r"            full="Other/INCIDENT/SECURITY/CIVIL DISTURB/RIOTING"         	    desc="Security Civil Disturbance Rioting"		                          />
+  <cot  cot="a-.-X-i-l-l"              full="Other/INCIDENT/SECURITY/LAW ENFORCEMENT"                       desc="Security Law Enforcement Activity"		                          />
+  <cot  cot="a-.-X-i-l-l-b"            full="Other/INCIDENT/SECURITY/LAW ENFORCEMENT/BOMBING"               desc="Security Law Enforcement Activity Bombing"		                  />
+  <cot  cot="a-.-X-i-l-l-b-e"          full="Other/INCIDENT/SECURITY/LAW ENFORCEMENT/BOMB EXPLOSION"        desc="Security Law Enforcement Activity Bombing Explosion"		          />
+  <cot  cot="a-.-X-i-l-l-b-t"          full="Other/INCIDENT/SECURITY/LAW ENFORCEMENTBOMB THREAT"            desc="Security Law Enforcement Activity Bombing Threat"		          />
+  <cot  cot="a-.-X-i-l-l-l"            full="Other/INCIDENT/SECURITY/LAW ENFORCEMENT/LOOTING"               desc="Security Law Enforcement Activity Looting"		                  />
+  <cot  cot="a-.-X-i-l-l-p"            full="Other/INCIDENT/SECURITY/LAW ENFORCEMENT/POISONING"             desc="Security Law Enforcement Activity Poisoning"		                  />
+  <cot  cot="a-.-X-i-l-l-s"            full="Other/INCIDENT/SECURITY/LAW ENFORCEMENT/SHOOTING"              desc="Security Law Enforcement Activity Shooting"		                  />
+  <cot  cot="a-.-X-i-r"                full="Other/INCIDENT/RESCUE"          		                    desc="Rescue"		                                                  />
+  <cot  cot="a-.-X-i-f"                full="Other/INCIDENT/FIRE"	         		            desc="Incident Fire"                                                          />
+  <cot  cot="a-.-X-i-f-w"              full="Other/INCIDENT/FIRE/WILD"       		                    desc="Incident Fire Wild"                                                     />
+  <cot  cot="a-.-X-i-f-n"              full="Other/INCIDENT/FIRE/NON RESIDENTIAL"        		    desc="Incident Fire Non-residential"                                          />
+  <cot  cot="a-.-X-i-f-n-h"            full="Other/INCIDENT/FIRE/NON RESIDENTIAL SPECIAL NEED"        	    desc="Incident Fire Non-residential Special Need"                             />
+  <cot  cot="a-.-X-i-f-n-s"            full="Other/INCIDENT/FIRE/NON RESIDENTIAL SCHOOL"       		    desc="Incident Fire Non-residential School"                                   />
+  <cot  cot="a-.-X-i-f-r"              full="Other/INCIDENT/FIRE/RESIDENTIAL"        		            desc="Incident Fire Residential"                                              />
+  <cot  cot="a-.-X-i-f-h"              full="Other/INCIDENT/FIRE/HOT SPOT"        		            desc="Incident Fire Hot Spot"                                                 />
+  <cot  cot="a-.-X-i-f-o"              full="Other/INCIDENT/FIRE/ORIGIN"        		            desc="Incident Fire Origin"                                                   />
+  <cot  cot="a-.-X-i-f-s"              full="Other/INCIDENT/FIRE/SMOKE"        		                    desc="Incident Fire Smoke"                                                    />
+  <cot  cot="a-.-X-i-f-p"              full="Other/INCIDENT/FIRE/SPECIAL NEEDS"        		            desc="Incident Fire Special Needs"                                            />
+  <cot  cot="a-.-X-i-h"                full="Other/INCIDENT/MEDICAL PUBLIC HEALTH"          		    desc="Medical and Public Health"		                                  />
+  <cot  cot="a-.-X-i-e"                full="Other/INCIDENT/POLLUTION ENVIRONMENTAL"          	            desc="Pollution and other Environmental"		                          />
+  <cot  cot="a-.-X-i-t"        	       full="Other/INCIDENT/TRANSPORTATION/"          		            desc="Public and Private transportation"		                          />
+  <cot  cot="a-.-X-i-t-a"              full="Other/INCIDENT/TRANSPORTATION/AIR"     	     	            desc="Public and Private transportation Air Incident"		          />
+  <cot  cot="a-.-X-i-t-a-a"            full="Other/INCIDENT/TRANSPORTATION/AIR ACCIDENT"      	  	    desc="Public and Private transportation Air Accident"		          />
+  <cot  cot="a-.-X-i-t-a-h"            full="Other/INCIDENT/TRANSPORTATION/AIR HIJACKING"          	    desc="Public and Private transportation Air Hijacking"		          />
+  <cot  cot="a-.-X-i-t-m"              full="Other/INCIDENT/TRANSPORTATION/MARITIME"     	            desc="Public and Private transportation Maritime Incident"		          />
+  <cot  cot="a-.-X-i-t-m-a"            full="Other/INCIDENT/TRANSPORTATION/MARITIME ACCIDENT"      	    desc="Public and Private transportation Maritime Accident"		          />
+  <cot  cot="a-.-X-i-t-m-h"            full="Other/INCIDENT/TRANSPORTATION/MARITIME HIJACKING"              desc="Public and Private transportation Maritime Hijacking"		          />
+  <cot  cot="a-.-X-i-t-r"              full="Other/INCIDENT/TRANSPORTATION/RAIL"     	    	            desc="Public and Private transportation Rail Incident"		          />
+  <cot  cot="a-.-X-i-t-r-a"            full="Other/INCIDENT/TRANSPORTATION/RAIL ACCIDENT"      		    desc="Public and Private transportation Rail Accident"		          />
+  <cot  cot="a-.-X-i-t-r-h"            full="Other/INCIDENT/TRANSPORTATION/RAIL HIJACKING"          	    desc="Public and Private transportation Rail Hijacking"		          />
+  <cot  cot="a-.-X-i-t-v"              full="Other/INCIDENT/TRANSPORTATION/VEHICLE"     	    	    desc="Public and Private transportation Vehicle Incident"		          />
+  <cot  cot="a-.-X-i-t-v-a"            full="Other/INCIDENT/TRANSPORTATION/VEHICLE ACCIDENT"      	    desc="Public and Private transportation Vehicle Accident"		          />
+  <cot  cot="a-.-X-i-t-v-h"            full="Other/INCIDENT/TRANSPORTATION/VEHICLE HIJACKING"               desc="Public and Private transportation Vehicle Hijacking"		          />
+  <cot  cot="a-.-X-i-i"                full="Other/INCIDENT/INFRASTRUCTURE"          			    desc="Infrastructure"		                                          />
+  <cot  cot="a-.-X-i-c"                full="Other/INCIDENT/CBRNE"          			            desc="CBRNE"	                                                          />
+  <cot  cot="a-.-X-i-o"                full="Other/INCIDENT/OTHER"          			            desc="Other"	                                                          />
