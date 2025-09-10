@@ -160,14 +160,18 @@ class CoTSender:
         Returns:
             True if sent successfully, False otherwise
         """
-        if not self._running or not self._queue:
+        if not self._running:
             logger.error("CoT sender not running")
+            return False
+        
+        if not self._queue:
+            logger.error("CoT queue not initialized")
             return False
         
         try:
             # Put the CoT XML in the queue
             await self._queue.put(cot_xml)
-            logger.debug(f"CoT event queued for transmission")
+            logger.info(f"CoT event queued for transmission (length: {len(cot_xml)} chars)")
             return True
             
         except Exception as e:

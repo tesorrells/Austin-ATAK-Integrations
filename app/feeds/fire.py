@@ -148,11 +148,14 @@ class FireFeedPoller:
         # Send CoT if sender is available
         cot_sent = False
         if cot_sender.is_running:
+            logger.info(f"Attempting to send CoT for fire incident: {incident.get('traffic_report_id', 'unknown')}")
             cot_sent = await cot_sender.send_cot(cot_xml)
             if cot_sent:
-                logger.debug(f"Sent CoT for fire incident: {incident.get('traffic_report_id', 'unknown')}")
+                logger.info(f"Successfully sent CoT for fire incident: {incident.get('traffic_report_id', 'unknown')}")
             else:
-                logger.warning(f"Failed to send CoT for fire incident: {incident.get('traffic_report_id', 'unknown')}")
+                logger.error(f"Failed to send CoT for fire incident: {incident.get('traffic_report_id', 'unknown')}")
+        else:
+            logger.error("CoT sender is not running, cannot send CoT")
         
         # Mark incident as seen
         await seen_store.mark_incident_seen("fire", incident, cot_sent)
