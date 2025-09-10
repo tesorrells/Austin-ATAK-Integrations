@@ -87,27 +87,33 @@ class CoTSender:
             # Start the writer and transmitter
             await writer.start()
             
-            # Try different ways to start TXWorker
+            # Start TXWorker as a background task to avoid blocking startup
             try:
-                # Method 1: Try start() method
-                await self._tx.start()
-                logger.info("Started TXWorker with start() method")
-            except AttributeError:
+                # Try to start TXWorker as a background task
+                asyncio.create_task(self._tx.run())
+                logger.info("Started TXWorker as background task")
+                # Give it a moment to start
+                await asyncio.sleep(0.1)
+            except Exception as e:
+                logger.warning(f"Failed to start TXWorker as task: {e}")
+                # Fallback: try other methods
                 try:
-                    # Method 2: Try run() method
-                    await self._tx.run()
-                    logger.info("Started TXWorker with run() method")
+                    # Method 1: Try start() method
+                    await self._tx.start()
+                    logger.info("Started TXWorker with start() method")
                 except AttributeError:
                     try:
-                        # Method 3: Try _run() method
-                        await self._tx._run()
-                        logger.info("Started TXWorker with _run() method")
+                        # Method 2: Try run() method
+                        await self._tx.run()
+                        logger.info("Started TXWorker with run() method")
                     except AttributeError:
-                        # Method 4: Try to start it as a task
-                        asyncio.create_task(self._tx.run())
-                        logger.info("Started TXWorker as asyncio task")
-                        # Give it a moment to start
-                        await asyncio.sleep(0.1)
+                        try:
+                            # Method 3: Try _run() method
+                            await self._tx._run()
+                            logger.info("Started TXWorker with _run() method")
+                        except AttributeError:
+                            logger.error("All TXWorker start methods failed")
+                            raise
             
             self._running = True
             logger.info("CoT sender started successfully")
