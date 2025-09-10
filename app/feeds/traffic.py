@@ -9,6 +9,7 @@ from app.config import settings
 from app.store.seen import seen_store
 from app.cot.build import build_traffic_incident_cot
 from app.cot.sender import cot_sender
+from app.cot.lifecycle import IncidentLifecycleManager
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +24,7 @@ class TrafficFeedPoller:
         self.stale_minutes = settings.cot_stale_minutes
         self._running = False
         self._client: Optional[httpx.AsyncClient] = None
+        self._lifecycle_manager = IncidentLifecycleManager()
     
     async def start(self) -> None:
         """Start the traffic feed poller."""
@@ -69,15 +71,15 @@ class TrafficFeedPoller:
             return
         
         try:
-            # Build query for incidents updated in the last 10 minutes
+            # Build query for incidents published in the last 10 minutes
             # This helps us catch updates to existing incidents
             ten_minutes_ago = datetime.now(timezone.utc) - timedelta(minutes=10)
-            where_clause = f"last_update >= '{ten_minutes_ago.isoformat()}'"
+            where_clause = f"published_date >= '{ten_minutes_ago.strftime('%Y-%m-%dT%H:%M:%S.000Z')}'"
             
             url = f"{self.base_url}/{self.dataset_id}.json"
             params = {
                 "$where": where_clause,
-                "$order": "last_update DESC",
+                "$order": "published_date DESC",
                 "$limit": 100  # Reasonable limit
             }
             
@@ -88,15 +90,31 @@ class TrafficFeedPoller:
             incidents = response.json()
             logger.info(f"Fetched {len(incidents)} traffic incidents")
             
-            # Process incidents
+            # Process incidents and check for closures
             incidents_sent = 0
+            current_incidents = {}
+            
             for incident in incidents:
                 try:
+                    incident_id = incident.get("traffic_report_id")
+                    if incident_id:
+                        current_incidents[incident_id] = incident
+                    
                     await self._process_incident(incident)
                     incidents_sent += 1
                 except Exception as e:
                     logger.error(f"Error processing traffic incident: {e}")
                     continue
+            
+            # Check for incident closures
+            closure_cots = self._lifecycle_manager.check_for_closures(current_incidents, "traffic")
+            for closure_cot in closure_cots:
+                if cot_sender.is_running:
+                    await cot_sender.send_cot(closure_cot)
+                    incidents_sent += 1
+            
+            # Clean up old tracked incidents
+            self._lifecycle_manager.cleanup_old_incidents()
             
             # Update feed state
             await seen_store.update_feed_state(
@@ -131,21 +149,21 @@ class TrafficFeedPoller:
         if cot_sender.is_running:
             cot_sent = await cot_sender.send_cot(cot_xml)
             if cot_sent:
-                logger.debug(f"Sent CoT for traffic incident: {incident.get('event_id', 'unknown')}")
+                logger.debug(f"Sent CoT for traffic incident: {incident.get('traffic_report_id', 'unknown')}")
             else:
-                logger.warning(f"Failed to send CoT for traffic incident: {incident.get('event_id', 'unknown')}")
+                logger.warning(f"Failed to send CoT for traffic incident: {incident.get('traffic_report_id', 'unknown')}")
         
         # Mark incident as seen
         await seen_store.mark_incident_seen("traffic", incident, cot_sent)
         
         if not is_seen:
-            logger.info(f"New traffic incident: {incident.get('event_id', 'unknown')} - {incident.get('category', 'TRAFFIC INCIDENT')}")
+            logger.info(f"New traffic incident: {incident.get('traffic_report_id', 'unknown')} - {incident.get('issue_reported', 'TRAFFIC INCIDENT')}")
     
     def _validate_incident(self, incident: Dict[str, Any]) -> bool:
         """Validate that an incident has required fields."""
         # Check for coordinates
-        lat = incident.get("latitude") or incident.get("lat")
-        lon = incident.get("longitude") or incident.get("lon")
+        lat = incident.get("latitude")
+        lon = incident.get("longitude")
         
         if not lat or not lon:
             logger.debug("Skipping traffic incident without coordinates")
@@ -160,9 +178,9 @@ class TrafficFeedPoller:
             return False
         
         # Check for incident identifier
-        incident_id = incident.get("event_id") or incident.get("id")
+        incident_id = incident.get("traffic_report_id")
         if not incident_id:
-            logger.debug("Skipping traffic incident without ID")
+            logger.debug("Skipping traffic incident without traffic_report_id")
             return False
         
         return True

@@ -146,9 +146,19 @@ async def stats():
         fire_stats = await fire_feed.get_stats()
         traffic_stats = await traffic_feed.get_stats()
         
+        # Get lifecycle statistics
+        fire_lifecycle = fire_feed._lifecycle_manager.get_tracking_stats()
+        traffic_lifecycle = traffic_feed._lifecycle_manager.get_tracking_stats()
+        
         return {
-            "fire_feed": fire_stats,
-            "traffic_feed": traffic_stats,
+            "fire_feed": {
+                **fire_stats,
+                "lifecycle": fire_lifecycle
+            },
+            "traffic_feed": {
+                **traffic_stats,
+                "lifecycle": traffic_lifecycle
+            },
             "cot_sender": {
                 "running": cot_sender.is_running,
                 "cot_url": settings.cot_url,

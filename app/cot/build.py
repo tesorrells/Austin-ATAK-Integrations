@@ -4,6 +4,9 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timezone, timedelta
 from typing import Optional
 import html
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def xml_escape(text: str) -> str:
@@ -75,8 +78,12 @@ def build_incident_cot(
     remarks_elem = ET.SubElement(detail, "remarks")
     remarks_elem.text = xml_escape(remarks)
     
-    # Convert to string
-    return ET.tostring(event, encoding="unicode")
+    # Convert to string with proper formatting
+    rough_string = ET.tostring(event, encoding="unicode")
+    
+    # Parse and reformat for better readability
+    reparsed = ET.fromstring(rough_string)
+    return ET.tostring(reparsed, encoding="unicode")
 
 
 def build_fire_incident_cot(
@@ -93,32 +100,49 @@ def build_fire_incident_cot(
     Returns:
         CoT XML string
     """
-    # Extract fields - adjust field names based on actual SODA response
-    incident_id = incident_data.get("incident_number", incident_data.get("id", "unknown"))
+    # Extract fields based on actual API response
+    incident_id = incident_data.get("traffic_report_id", "unknown")
     uid = f"austin.fire.{incident_id}"
     
-    # Get coordinates - adjust field names as needed
-    lat = float(incident_data.get("latitude", incident_data.get("lat", 0)))
-    lon = float(incident_data.get("longitude", incident_data.get("lon", 0)))
+    # Get coordinates from actual API fields
+    try:
+        lat = float(incident_data.get("latitude", 0))
+        lon = float(incident_data.get("longitude", 0))
+        
+        # Validate coordinates are reasonable (Austin area roughly)
+        if not (-98.0 <= lon <= -97.0) or not (30.0 <= lat <= 31.0):
+            logger.warning(f"Fire incident {incident_id} has coordinates outside Austin area: {lat}, {lon}")
+    except (ValueError, TypeError) as e:
+        logger.error(f"Invalid coordinates for fire incident {incident_id}: {e}")
+        lat, lon = 0.0, 0.0
     
-    # Build callsign
-    category = incident_data.get("category", incident_data.get("incident_type", "INCIDENT"))
-    callsign = f"AFD: {category}"
+    # Build callsign from issue_reported field
+    issue_reported = incident_data.get("issue_reported", "INCIDENT")
+    callsign = f"AFD: {issue_reported}"
     
     # Build remarks
-    address = incident_data.get("address", incident_data.get("location", "Unknown Location"))
-    status = incident_data.get("status", "Active")
-    units = incident_data.get("units", "")
+    address = incident_data.get("address", "Unknown Location")
+    status = incident_data.get("traffic_report_status", "Active")
+    published_date = incident_data.get("published_date", "")
     
-    remarks_parts = [f"{category} @ {address}"]
-    if units:
-        remarks_parts.append(f"Units: {units}")
+    remarks_parts = [f"{issue_reported} @ {address}"]
     remarks_parts.append(f"Status: {status}")
+    
+    # Add published date if available
+    if published_date:
+        try:
+            # Parse and format the date for readability
+            from datetime import datetime
+            dt = datetime.fromisoformat(published_date.replace('Z', '+00:00'))
+            formatted_date = dt.strftime("%Y-%m-%d %H:%M UTC")
+            remarks_parts.append(f"Reported: {formatted_date}")
+        except:
+            pass  # Skip if date parsing fails
     
     remarks = " | ".join(remarks_parts)
     
-    # Build link
-    link = f"https://data.austintexas.gov/resource/wpu4-x69d.json?incident_number={incident_id}"
+    # Build link using traffic_report_id
+    link = f"https://data.austintexas.gov/resource/wpu4-x69d.json?traffic_report_id={incident_id}"
     
     return build_incident_cot(
         uid=uid,
@@ -145,32 +169,49 @@ def build_traffic_incident_cot(
     Returns:
         CoT XML string
     """
-    # Extract fields - adjust field names based on actual SODA response
-    incident_id = incident_data.get("event_id", incident_data.get("id", "unknown"))
+    # Extract fields based on actual API response
+    incident_id = incident_data.get("traffic_report_id", "unknown")
     uid = f"austin.traffic.{incident_id}"
     
-    # Get coordinates - adjust field names as needed
-    lat = float(incident_data.get("latitude", incident_data.get("lat", 0)))
-    lon = float(incident_data.get("longitude", incident_data.get("lon", 0)))
+    # Get coordinates from actual API fields
+    try:
+        lat = float(incident_data.get("latitude", 0))
+        lon = float(incident_data.get("longitude", 0))
+        
+        # Validate coordinates are reasonable (Austin area roughly)
+        if not (-98.0 <= lon <= -97.0) or not (30.0 <= lat <= 31.0):
+            logger.warning(f"Traffic incident {incident_id} has coordinates outside Austin area: {lat}, {lon}")
+    except (ValueError, TypeError) as e:
+        logger.error(f"Invalid coordinates for traffic incident {incident_id}: {e}")
+        lat, lon = 0.0, 0.0
     
-    # Build callsign
-    category = incident_data.get("category", incident_data.get("incident_type", "TRAFFIC INCIDENT"))
-    callsign = f"APD: {category}"
+    # Build callsign from issue_reported field
+    issue_reported = incident_data.get("issue_reported", "TRAFFIC INCIDENT")
+    callsign = f"APD: {issue_reported}"
     
     # Build remarks
-    location = incident_data.get("location", incident_data.get("address", "Unknown Location"))
-    status = incident_data.get("status", "Active")
-    description = incident_data.get("description", "")
+    address = incident_data.get("address", "Unknown Location")
+    status = incident_data.get("traffic_report_status", "Active")
+    published_date = incident_data.get("published_date", "")
     
-    remarks_parts = [f"{category} @ {location}"]
-    if description:
-        remarks_parts.append(description)
+    remarks_parts = [f"{issue_reported} @ {address}"]
     remarks_parts.append(f"Status: {status}")
+    
+    # Add published date if available
+    if published_date:
+        try:
+            # Parse and format the date for readability
+            from datetime import datetime
+            dt = datetime.fromisoformat(published_date.replace('Z', '+00:00'))
+            formatted_date = dt.strftime("%Y-%m-%d %H:%M UTC")
+            remarks_parts.append(f"Reported: {formatted_date}")
+        except:
+            pass  # Skip if date parsing fails
     
     remarks = " | ".join(remarks_parts)
     
-    # Build link
-    link = f"https://data.austintexas.gov/resource/dx9v-zd7x.json?event_id={incident_id}"
+    # Build link using traffic_report_id
+    link = f"https://data.austintexas.gov/resource/dx9v-zd7x.json?traffic_report_id={incident_id}"
     
     return build_incident_cot(
         uid=uid,

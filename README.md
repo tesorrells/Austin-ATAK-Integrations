@@ -8,6 +8,7 @@ Real-time fire and traffic incident feeds for TAK/ATAK systems, providing Cursor
 - **Real-time Traffic Incidents**: Polls Austin Police Department traffic incident data every 45 seconds
 - **CoT XML Generation**: Converts incident data to Cursor-on-Target XML format
 - **TAK Server Integration**: Sends CoT events to TAK Server over TLS
+- **Incident Lifecycle Management**: Automatically removes incidents when they're no longer active
 - **Deduplication**: Prevents duplicate incident reporting
 - **Health Monitoring**: REST API endpoints for health checks and metrics
 - **Docker Support**: Containerized deployment with Docker Compose
@@ -115,9 +116,18 @@ Each incident generates a CoT XML event with:
 - **Type**: `b-e-i` (incident/event)
 - **UID**: `austin.fire.{incident_id}` or `austin.traffic.{event_id}`
 - **Location**: Latitude/longitude from incident data
-- **Contact**: `AFD: {category}` or `APD: {category}`
-- **Remarks**: Incident details, address, status, units
+- **Contact**: `AFD: {issue}` or `APD: {issue}`
+- **Remarks**: Incident details, address, status, publication date
 - **Link**: Direct link to source data
+
+### Incident Lifecycle
+
+The system automatically manages incident lifecycle:
+
+- **New Incidents**: Sent with normal stale time (10 minutes)
+- **Status Changes**: Detected when incidents change from `ACTIVE` to `ARCHIVED`
+- **Closure Events**: Sent with immediate stale time (1 minute) to remove from ATAK
+- **Closure Reasons**: `INCIDENT ARCHIVED`, `INCIDENT CLOSED`, `INCIDENT RESOLVED`
 
 Example CoT:
 
@@ -240,9 +250,27 @@ sudo tcpdump -i any port 6969
 # Install dependencies
 pip install -r requirements.txt
 
+# Run tests
+python run_tests.py
+
 # Run locally
 python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8080
 ```
+
+### Testing
+
+The project includes comprehensive tests for all core functionality:
+
+```bash
+# Run core tests (API endpoints and CoT generation)
+python run_tests.py
+
+# Run individual test modules
+python tests/test_api_endpoints.py
+python tests/test_cot_generation.py
+```
+
+Test results are documented in `tests/test_summary.md`.
 
 ### Project Structure
 
