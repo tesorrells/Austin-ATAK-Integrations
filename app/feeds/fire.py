@@ -45,8 +45,9 @@ class FireFeedPoller:
         self._running = True
         logger.info("Fire feed poller started")
         
-        # Start polling loop
+        # Start polling loop as a background task
         asyncio.create_task(self._poll_loop())
+        logger.info("Fire feed polling loop started")
     
     async def stop(self) -> None:
         """Stop the fire feed poller."""

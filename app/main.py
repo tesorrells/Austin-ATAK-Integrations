@@ -38,9 +38,19 @@ async def lifespan(app: FastAPI):
         logger.info("CoT sender started")
         
         # Start feed pollers
-        await fire_feed.start()
-        await traffic_feed.start()
-        logger.info("Feed pollers started")
+        try:
+            await fire_feed.start()
+            logger.info("Fire feed poller started")
+        except Exception as e:
+            logger.error(f"Failed to start fire feed: {e}")
+            raise
+        
+        try:
+            await traffic_feed.start()
+            logger.info("Traffic feed poller started")
+        except Exception as e:
+            logger.error(f"Failed to start traffic feed: {e}")
+            raise
         
         logger.info("Application startup complete")
         
