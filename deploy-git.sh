@@ -11,6 +11,12 @@ echo "============================================="
 DEPLOY_DIR="$HOME/austin-atak-integrations"
 SERVICE_NAME="austin-atak-integrations"
 
+# Check if we're running as root and adjust accordingly
+if [ "$EUID" -eq 0 ]; then
+    log_warn "Running as root. Using /opt/austin-atak-integrations instead of home directory."
+    DEPLOY_DIR="/opt/austin-atak-integrations"
+fi
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -72,9 +78,12 @@ if [ -d "$DEPLOY_DIR" ]; then
         log_info "Pulling latest changes..."
         git pull
     else
-        log_error "Directory exists but is not a git repository"
-        echo "Please remove $DEPLOY_DIR and try again, or specify a different directory"
-        exit 1
+        log_warn "Directory exists but is not a git repository"
+        log_info "Removing existing directory and starting fresh..."
+        cd ..
+        rm -rf "$DEPLOY_DIR"
+        mkdir -p "$DEPLOY_DIR"
+        cd "$DEPLOY_DIR"
     fi
 else
     log_info "Creating new deployment directory..."
