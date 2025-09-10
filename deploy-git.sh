@@ -82,18 +82,8 @@ else
     cd "$DEPLOY_DIR"
     
     # Clone the repository
-    log_info "Please provide the git repository URL:"
-    echo "  Example: https://github.com/yourusername/Austin-ATAK-Integrations.git"
-    echo "  Or: git@github.com:yourusername/Austin-ATAK-Integrations.git"
-    echo ""
-    read -p "Git repository URL: " REPO_URL
-    
-    if [ -z "$REPO_URL" ]; then
-        log_error "Repository URL is required"
-        exit 1
-    fi
-    
-    log_info "Cloning repository..."
+    REPO_URL="https://github.com/tesorrells/Austin-ATAK-Integrations.git"
+    log_info "Cloning repository from: $REPO_URL"
     git clone "$REPO_URL" .
 fi
 
