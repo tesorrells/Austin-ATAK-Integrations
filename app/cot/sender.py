@@ -32,14 +32,33 @@ class CoTSender:
                 "PYTAK_TLS_CA": settings.pytak_tls_ca,
             }
             
-            # Create queue, writer, and transmitter
+            # Create queue and workers using PyTAK v7+ API
             self._queue = asyncio.Queue()
-            self._writer = pytak.Writer(self._queue, config)
-            self._tx = pytak.TXWorker(self._queue, config, self._writer)
             
-            # Start writer and transmitter
-            await self._writer.start()
-            await self._tx.start()
+            # Try different PyTAK API patterns
+            try:
+                # Pattern 1: Try with Writer first
+                self._writer = pytak.Writer(self._queue, config)
+                self._tx = pytak.TXWorker(self._queue, config, self._writer)
+                await self._writer.start()
+                await self._tx.start()
+            except Exception as e1:
+                logger.warning(f"Writer pattern failed: {e1}")
+                try:
+                    # Pattern 2: Try without Writer
+                    self._tx = pytak.TXWorker(self._queue, config)
+                    await self._tx.start()
+                except Exception as e2:
+                    logger.warning(f"TXWorker without Writer failed: {e2}")
+                    try:
+                        # Pattern 3: Try with QueueWorker
+                        self._queue_worker = pytak.QueueWorker(self._queue, config)
+                        self._tx = pytak.TXWorker(self._queue, config)
+                        await self._queue_worker.start()
+                        await self._tx.start()
+                    except Exception as e3:
+                        logger.error(f"All PyTAK patterns failed: {e3}")
+                        raise e3
             
             self._running = True
             logger.info("CoT sender started successfully")
@@ -54,10 +73,12 @@ class CoTSender:
             return
         
         try:
-            if self._tx:
+            if hasattr(self, '_tx') and self._tx:
                 await self._tx.stop()
-            if self._writer:
+            if hasattr(self, '_writer') and self._writer:
                 await self._writer.stop()
+            if hasattr(self, '_queue_worker') and self._queue_worker:
+                await self._queue_worker.stop()
             
             self._running = False
             logger.info("CoT sender stopped")
